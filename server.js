@@ -18,13 +18,6 @@ app.use(morgan("dev"))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended : false}))
 
-
-app.get("/", (req, res) => {
-    res.json({
-        msg : "start blog..."
-    })
-})
-
 app.use('/user', userRouter)
 
 const PORT = process.env.PORT || 9000
