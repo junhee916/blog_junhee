@@ -1,7 +1,6 @@
 const express = require('express')
 const userModel = require('../model/user')
 const jwt = require('jsonwebtoken')
-const bcrypt = require('bcryptjs')
 const router = express.Router()
 
 
@@ -92,8 +91,65 @@ router.post('/signup', async (req, res) => {
 // @desc    Login User / Return Token
 // @access  Public
 
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
 
+    const {email, password} = req.body
+
+    // userModel
+    //     .findOne({email})
+    //     .then(user => {
+    //         if(!user){
+    //             return res.status(400).json({
+    //                 msg : "user email, please other email"
+    //             })
+    //         }
+    //         else{
+    //
+    //         }
+    //     })
+    //     .catch(err => {
+    //         res.status(500).json({
+    //             msg : err.message
+    //         })
+    //     })
+
+    try{
+
+        const user = await userModel.findOne({email})
+        if(!user){
+            return res.status(400).json({
+                msg : 'user email, please other email'
+            })
+        }
+        else{
+            await user.comparePassword(password, (err, isMatch) => {
+                if(err || !isMatch){
+                    return res.status(400).json({
+                        msg : "not match password"
+                    })
+                }
+                else{
+                    // token 생성
+                    const payload = {
+                        id : user._id
+                    }
+                    const token = jwt.sign(
+                        payload,
+                        process.env.SECRET_KEY,
+                        {expiresIn: '1h'}
+                    )
+
+                    res.json({token})
+                }
+            })
+        }
+
+    }catch (err){
+
+        res.status(500).json({
+            msg : err.message
+        })
+    }
 })
 
 module.exports = router

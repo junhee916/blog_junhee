@@ -44,6 +44,12 @@ userSchema.pre('save', async function(next){
             {forceHttps: true}
         )
 
+        // const avatar = gravatar.url(this.email, {
+        //     s : '200',
+        //     r : 'pg',
+        //     d : 'mm'
+        // })
+
         this.profileImage = avatar
         // password 암호화
         const salt = await bcrypt.genSalt(10)
@@ -58,5 +64,12 @@ userSchema.pre('save', async function(next){
         next(err)
     }
 })
+
+userSchema.methods.comparePassword = function (userInputPassword, cb){
+    bcrypt.compare(userInputPassword, this.password, function (err, isMatch){
+        if(err) return cb(err)
+        cb(null, isMatch)
+    })
+}
 
 module.exports = mongoose.model('user', userSchema)
