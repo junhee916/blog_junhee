@@ -5,9 +5,8 @@ const morgan = require('morgan')
 const cors = require('cors')
 const app = express()
 
-
-require('./config/database')
-
+const connectDB = require('./config/database')
+connectDB()
 
 const userRouter = require('./router/user')
 
